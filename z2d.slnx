@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../z2dTest/z2dTest.csproj" />
+  <Project Path="z2d.csproj" />
+</Solution>
