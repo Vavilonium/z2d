@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
+using z2d.Models;
 using z2d.Services;
 
 namespace z2d
@@ -14,9 +16,11 @@ namespace z2d
 
         private readonly string _baseDir = AppContext.BaseDirectory;
         private readonly WinwsStatusService _winwsStatusService = new();
+        private readonly UserSettingsService _userSettingsService = new();
         private Dictionary<string, FileInfo> _presets = new(StringComparer.OrdinalIgnoreCase);
         private Process? _currentProcess;
         private bool _isWinwsRunning;
+        private bool _isLoadingPresets;
 
         public MainWindow()
         {
@@ -38,14 +42,17 @@ namespace z2d
         {
             try
             {
+                _isLoadingPresets = true;
                 SetStatus("Загружаем пресеты...");
 
                 _presets = await PresetDiscoveryService.GetPresetsAsync(PresetsDirectoryName, _baseDir);
-                PresetComboBox.ItemsSource = _presets.OrderBy(x => x.Key).ToList();
+                var presetItems = _presets.OrderBy(x => x.Key).ToList();
+                PresetComboBox.ItemsSource = presetItems;
 
-                if (PresetComboBox.Items.Count > 0)
+                if (presetItems.Count > 0)
                 {
-                    PresetComboBox.SelectedIndex = 0;
+                    var settings = await _userSettingsService.LoadAsync();
+                    PresetComboBox.SelectedIndex = GetPresetIndexToSelect(presetItems, settings.LastSelectedPresetName);
                     SetStatus($"Найдено пресетов: {_presets.Count}");
                 }
                 else
@@ -59,7 +66,50 @@ namespace z2d
             }
             finally
             {
+                _isLoadingPresets = false;
                 UpdateUiState();
+            }
+        }
+
+        private static int GetPresetIndexToSelect(
+            List<KeyValuePair<string, FileInfo>> presetItems,
+            string? lastSelectedPresetName)
+        {
+            if (string.IsNullOrWhiteSpace(lastSelectedPresetName))
+            {
+                return 0;
+            }
+
+            var savedPresetIndex = presetItems.FindIndex(x =>
+                string.Equals(x.Key, lastSelectedPresetName, StringComparison.OrdinalIgnoreCase));
+
+            return savedPresetIndex >= 0
+                ? savedPresetIndex
+                : 0;
+        }
+
+        private async void PresetComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isLoadingPresets)
+            {
+                return;
+            }
+
+            if (PresetComboBox.SelectedItem is not KeyValuePair<string, FileInfo> selectedPreset)
+            {
+                return;
+            }
+
+            try
+            {
+                await _userSettingsService.SaveAsync(new UserSettings
+                {
+                    LastSelectedPresetName = selectedPreset.Key
+                });
+            }
+            catch (Exception ex)
+            {
+                SetStatus($"Не удалось сохранить настройки: {ex.Message}");
             }
         }
 

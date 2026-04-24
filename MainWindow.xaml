@@ -36,7 +36,8 @@
                   Grid.Row="2"
                   Height="32"
                   DisplayMemberPath="Key"
-                  SelectedValuePath="Key" />
+                  SelectedValuePath="Key"
+                  SelectionChanged="PresetComboBox_OnSelectionChanged" />
 
         <StackPanel Grid.Row="3"
                     Margin="0,16,0,0"
