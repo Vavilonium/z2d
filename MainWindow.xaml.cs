@@ -136,7 +136,10 @@ namespace z2d
                 var arguments = await WinwsArgsBuilder.BuildArgumentsAsync(selectedPreset.Value.FullName);
                 var exePath = Path.Combine(_baseDir, ExeDirectoryName, ExecutableName);
 
-                _currentProcess = await WinwsProcessService.StartAsync(exePath, arguments, _baseDir);
+                var isHiddenMode = HiddenModeCheckBox.IsChecked == true;
+
+                //TODO: привязать режим к чекбоксу в UI!!!
+                _currentProcess = await WinwsProcessService.StartAsync(exePath, arguments, _baseDir, isHiddenMode);
 
                 if (_currentProcess is null)
                 {
@@ -200,6 +203,7 @@ namespace z2d
             StartButton.IsEnabled = !_isWinwsRunning && PresetComboBox.Items.Count > 0;
             StopButton.IsEnabled = _isWinwsRunning;
             PresetComboBox.IsEnabled = !_isWinwsRunning;
+            HiddenModeCheckBox.IsEnabled = !_isWinwsRunning;
         }
 
         private void SetStatus(string message)

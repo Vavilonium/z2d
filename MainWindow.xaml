@@ -5,13 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="zapret2 UI"
-        Height="260"
+        Height="270"
         Width="420"
-        MinHeight="260"
+        MinHeight="270"
         MinWidth="420"
         WindowStartupLocation="CenterScreen">
     <Grid Margin="16">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -40,6 +41,16 @@
                   SelectionChanged="PresetComboBox_OnSelectionChanged" />
 
         <StackPanel Grid.Row="3"
+                    Margin="0,12,0,0"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center">
+
+            <CheckBox x:Name="HiddenModeCheckBox"
+                      Content="Запускать без окна"
+                      VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="4"
                     Margin="0,16,0,0"
                     Orientation="Horizontal">
             <Button x:Name="StartButton"
@@ -56,7 +67,7 @@
         </StackPanel>
 
         <TextBlock x:Name="StatusTextBlock"
-                   Grid.Row="4"
+                   Grid.Row="5"
                    Margin="0,16,0,0"
                    TextWrapping="Wrap"
                    VerticalAlignment="Top" />
