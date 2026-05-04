@@ -47,7 +47,9 @@
 
             <CheckBox x:Name="HiddenModeCheckBox"
                       Content="Запускать без окна"
-                      VerticalAlignment="Center" />
+                      VerticalAlignment="Center"
+                      Checked="HiddenModeCheckBox_OnChanged"
+                      Unchecked="HiddenModeCheckBox_OnChanged" />
         </StackPanel>
 
         <StackPanel Grid.Row="4"
