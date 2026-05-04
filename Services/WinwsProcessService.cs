@@ -12,6 +12,7 @@ namespace z2d.Services
             string exePath,
             string arguments,
             string workingDirectory,
+            bool createNoWindow,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -34,7 +35,7 @@ namespace z2d.Services
                     FileName = exePath,
                     Arguments = arguments,
                     UseShellExecute = false,
-                    CreateNoWindow = false,
+                    CreateNoWindow = createNoWindow,
                     WorkingDirectory = workingDirectory
                 };
 

@@ -20,7 +20,8 @@ namespace z2d
         private Dictionary<string, FileInfo> _presets = new(StringComparer.OrdinalIgnoreCase);
         private Process? _currentProcess;
         private bool _isWinwsRunning;
-        private bool _isLoadingPresets;
+        private bool _isInitializingUserState;
+        private UserSettings _currentUserSettings = new();
 
         public MainWindow()
         {
@@ -35,14 +36,26 @@ namespace z2d
             _winwsStatusService.StatusChanged += OnWinwsStatusChanged;
             _winwsStatusService.StartWatching();
 
-            await LoadPresetsAsync();
+            _isInitializingUserState = true;
+
+            try
+            {
+                _currentUserSettings = await _userSettingsService.LoadAsync();
+                HiddenModeCheckBox.IsChecked = _currentUserSettings.StartWithoutWindow;
+                await LoadPresetsAsync(_currentUserSettings);
+            }
+            finally
+            {
+                _isInitializingUserState = false;
+                UpdateUiState();
+            }
+            
         }
 
-        private async Task LoadPresetsAsync()
+        private async Task LoadPresetsAsync(UserSettings settings)
         {
             try
             {
-                _isLoadingPresets = true;
                 SetStatus("Загружаем пресеты...");
 
                 _presets = await PresetDiscoveryService.GetPresetsAsync(PresetsDirectoryName, _baseDir);
@@ -51,7 +64,6 @@ namespace z2d
 
                 if (presetItems.Count > 0)
                 {
-                    var settings = await _userSettingsService.LoadAsync();
                     PresetComboBox.SelectedIndex = GetPresetIndexToSelect(presetItems, settings.LastSelectedPresetName);
                     SetStatus($"Найдено пресетов: {_presets.Count}");
                 }
@@ -63,11 +75,6 @@ namespace z2d
             catch (Exception ex)
             {
                 SetStatus($"Ошибка загрузки пресетов: {ex.Message}");
-            }
-            finally
-            {
-                _isLoadingPresets = false;
-                UpdateUiState();
             }
         }
 
@@ -90,7 +97,7 @@ namespace z2d
 
         private async void PresetComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_isLoadingPresets)
+            if (_isInitializingUserState)
             {
                 return;
             }
@@ -100,12 +107,26 @@ namespace z2d
                 return;
             }
 
+            _currentUserSettings.LastSelectedPresetName = selectedPreset.Key;
+            await SaveCurrentUserSettingsAsync();
+        }
+
+        private async void HiddenModeCheckBox_OnChanged(object sender, RoutedEventArgs e)
+        {
+            if (_isInitializingUserState)
+            {
+                return;
+            }
+
+            _currentUserSettings.StartWithoutWindow = HiddenModeCheckBox.IsChecked == true;
+            await SaveCurrentUserSettingsAsync();
+        }
+
+        private async Task SaveCurrentUserSettingsAsync()
+        {
             try
             {
-                await _userSettingsService.SaveAsync(new UserSettings
-                {
-                    LastSelectedPresetName = selectedPreset.Key
-                });
+                await _userSettingsService.SaveAsync(_currentUserSettings);
             }
             catch (Exception ex)
             {
@@ -136,7 +157,9 @@ namespace z2d
                 var arguments = await WinwsArgsBuilder.BuildArgumentsAsync(selectedPreset.Value.FullName);
                 var exePath = Path.Combine(_baseDir, ExeDirectoryName, ExecutableName);
 
-                _currentProcess = await WinwsProcessService.StartAsync(exePath, arguments, _baseDir);
+                var isHiddenMode = HiddenModeCheckBox.IsChecked == true;
+
+                _currentProcess = await WinwsProcessService.StartAsync(exePath, arguments, _baseDir, isHiddenMode);
 
                 if (_currentProcess is null)
                 {
@@ -184,10 +207,15 @@ namespace z2d
             });
         }
 
-        private void MainWindow_OnClosing(object? sender, System.ComponentModel.CancelEventArgs e)
+        private async void MainWindow_OnClosing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             _winwsStatusService.StatusChanged -= OnWinwsStatusChanged;
             _winwsStatusService.Dispose();
+
+            if (!_isInitializingUserState)
+            {
+                await SaveCurrentUserSettingsAsync();
+            }
 
             if (_currentProcess is { HasExited: false })
             {
@@ -200,6 +228,7 @@ namespace z2d
             StartButton.IsEnabled = !_isWinwsRunning && PresetComboBox.Items.Count > 0;
             StopButton.IsEnabled = _isWinwsRunning;
             PresetComboBox.IsEnabled = !_isWinwsRunning;
+            HiddenModeCheckBox.IsEnabled = !_isWinwsRunning;
         }
 
         private void SetStatus(string message)
