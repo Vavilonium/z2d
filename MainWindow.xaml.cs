@@ -252,5 +252,15 @@ namespace z2d
                     : Brushes.DarkOrange;
             });
         }
+
+        private void PresetTestMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            var window = new PresetTestWindow(_baseDir, _presets)
+            {
+                Owner = this
+            };
+
+            window.ShowDialog();
+        }
     }
 }

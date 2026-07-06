@@ -10,68 +10,76 @@
         MinHeight="270"
         MinWidth="420"
         WindowStartupLocation="CenterScreen">
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
 
-        <TextBlock x:Name="WinwsStateTextBlock"
-                   Margin="0,0,0,12"
-                   FontSize="14"
-                   FontWeight="SemiBold"
-                   Text="winws: не запущен"
-                   Foreground="DarkOrange" />
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Тест пресетов"
+                      Click="PresetTestMenuItem_OnClick" />
+        </Menu>
 
-        <TextBlock Grid.Row="1"
-                   Text="Пресет"
-                   Margin="0,0,0,8"
-                   FontSize="14"
-                   FontWeight="SemiBold" />
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <ComboBox x:Name="PresetComboBox"
-                  Grid.Row="2"
-                  Height="32"
-                  DisplayMemberPath="Key"
-                  SelectedValuePath="Key"
-                  SelectionChanged="PresetComboBox_OnSelectionChanged" />
+            <TextBlock x:Name="WinwsStateTextBlock"
+               Margin="0,0,0,12"
+               FontSize="14"
+               FontWeight="SemiBold"
+               Text="winws: не запущен"
+               Foreground="DarkOrange" />
 
-        <StackPanel Grid.Row="3"
-                    Margin="0,12,0,0"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Center">
+            <TextBlock Grid.Row="1"
+               Text="Пресет"
+               Margin="0,0,0,8"
+               FontSize="14"
+               FontWeight="SemiBold" />
 
-            <CheckBox x:Name="HiddenModeCheckBox"
-                      Content="Запускать без окна"
-                      VerticalAlignment="Center"
-                      Checked="HiddenModeCheckBox_OnChanged"
-                      Unchecked="HiddenModeCheckBox_OnChanged" />
-        </StackPanel>
+            <ComboBox x:Name="PresetComboBox"
+              Grid.Row="2"
+              Height="32"
+              DisplayMemberPath="Key"
+              SelectedValuePath="Key"
+              SelectionChanged="PresetComboBox_OnSelectionChanged" />
 
-        <StackPanel Grid.Row="4"
-                    Margin="0,16,0,0"
-                    Orientation="Horizontal">
-            <Button x:Name="StartButton"
-                    Width="120"
-                    Height="34"
-                    Margin="0,0,12,0"
-                    Click="StartButton_OnClick"
-                    Content="Start" />
-            <Button x:Name="StopButton"
-                    Width="120"
-                    Height="34"
-                    Click="StopButton_OnClick"
-                    Content="Stop" />
-        </StackPanel>
+            <StackPanel Grid.Row="3"
+                Margin="0,12,0,0"
+                Orientation="Horizontal"
+                VerticalAlignment="Center">
 
-        <TextBlock x:Name="StatusTextBlock"
-                   Grid.Row="5"
-                   Margin="0,16,0,0"
-                   TextWrapping="Wrap"
-                   VerticalAlignment="Top" />
-    </Grid>
+                <CheckBox x:Name="HiddenModeCheckBox"
+                  Content="Запускать без окна"
+                  VerticalAlignment="Center"
+                  Checked="HiddenModeCheckBox_OnChanged"
+                  Unchecked="HiddenModeCheckBox_OnChanged" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="4"
+                Margin="0,16,0,0"
+                Orientation="Horizontal">
+                <Button x:Name="StartButton"
+                Width="120"
+                Height="34"
+                Margin="0,0,12,0"
+                Click="StartButton_OnClick"
+                Content="Start" />
+                <Button x:Name="StopButton"
+                Width="120"
+                Height="34"
+                Click="StopButton_OnClick"
+                Content="Stop" />
+            </StackPanel>
+
+            <TextBlock x:Name="StatusTextBlock"
+               Grid.Row="5"
+               Margin="0,16,0,0"
+               TextWrapping="Wrap"
+               VerticalAlignment="Top" />
+        </Grid>
+    </DockPanel>
 </Window>
