@@ -30,31 +30,67 @@
             </Grid.ColumnDefinitions>
 
             <GroupBox Grid.Column="0"
-                      Header="Targets">
-                <ListBox x:Name="TargetsListBox"
-                         BorderThickness="0">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                      Content="{Binding DisplayName}"
-                                      Margin="4" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                Header="Targets">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top"
+                            Orientation="Horizontal"
+                            Margin="0,0,0,8">
+                        <Button x:Name="SelectAllTargetsButton" 
+                            Width="100"
+                            Height="28"
+                            Margin="0,0,8,0"
+                            Content="Выбрать все"
+                            Click="SelectAllTargetsButton_OnClick" />
+                        <Button x:Name="ClearAllTargetsButton" 
+                            Width="100"
+                            Height="28"
+                            Content="Очистить все"
+                            Click="ClearAllTargetsButton_OnClick" />
+                    </StackPanel>
+
+                    <ListBox x:Name="TargetsListBox"
+                        BorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                    Content="{Binding DisplayName}"
+                                    Margin="4" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
             </GroupBox>
 
             <GroupBox Grid.Column="2"
-                      Header="Presets">
-                <ListBox x:Name="PresetsListBox"
-                         BorderThickness="0">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                      Content="{Binding DisplayName}"
-                                      Margin="4" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                Header="Presets">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top"
+                            Orientation="Horizontal"
+                            Margin="0,0,0,8">
+                        <Button x:Name="SelectAllPresetsButton"
+                            Width="100"
+                            Height="28"
+                            Margin="0,0,8,0"
+                            Content="Выбрать все"
+                            Click="SelectAllPresetsButton_OnClick" />
+                        <Button x:Name="ClearAllPresetsButton"
+                            Width="100"
+                            Height="28"
+                            Content="Очистить все"
+                            Click="ClearAllPresetsButton_OnClick" />
+                    </StackPanel>
+
+                    <ListBox x:Name="PresetsListBox"
+                            BorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                    Content="{Binding DisplayName}"
+                                    Margin="4" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
             </GroupBox>
         </Grid>
 

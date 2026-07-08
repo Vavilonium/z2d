@@ -16,6 +16,7 @@ namespace z2d
         private readonly string _baseDir;
         private readonly IReadOnlyDictionary<string, FileInfo> _presets;
         private readonly TargetReaderService _targetReaderService = new();
+        private readonly PresetTestRunner _presetTestRunner;
 
         private readonly ObservableCollection<SelectableItem<TargetItem>> _targets = new();
         private readonly ObservableCollection<SelectableItem<FileInfo>> _presetItems = new();
@@ -26,6 +27,7 @@ namespace z2d
 
             _baseDir = baseDir;
             _presets = presets;
+            _presetTestRunner = new PresetTestRunner(baseDir);
 
             TargetsListBox.ItemsSource = _targets;
             PresetsListBox.ItemsSource = _presetItems;
@@ -76,9 +78,97 @@ namespace z2d
             }
         }
 
-        private void StartTestButton_OnClick(object sender, RoutedEventArgs e)
+        private void SelectAllTargetsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            
+            SetSelection(_targets, isSelected: true);
+        }
+
+        private void ClearAllTargetsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            SetSelection(_targets, isSelected: false);
+        }
+
+        private void SelectAllPresetsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            SetSelection(_presetItems, isSelected: true);
+        }
+
+        private void ClearAllPresetsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            SetSelection(_presetItems, isSelected: false);
+        }
+
+        private static void SetSelection<T>(
+            IEnumerable<SelectableItem<T>> items,
+            bool isSelected)
+        {
+            foreach (var item in items)
+            {
+                item.IsSelected = isSelected;
+            }
+        }
+
+        private async void StartTestButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedTargets = _targets
+                .Where(x => x.IsSelected)
+                .Select(x => x.Value)
+                .ToList();
+
+            var selectedPresets = _presetItems
+                .Where(x => x.IsSelected)
+                .Select(x => x.Value)
+                .ToList();
+
+            var request = new PresetTestRunRequest
+            {
+                Targets = selectedTargets,
+                Presets = selectedPresets,
+                TimeoutSeconds = 5,
+                MaxParallelTargets = 8
+            };
+
+            var progress = new Progress<PresetTestProgress>(p =>
+            {
+                TestProgressBar.Value = p.Percent;
+                Title = $"Тест пресетов - {p.CurrentPresetName} ({p.PresetIndex}/{p.PresetCount})";
+            });
+
+            SetTestingState(true);
+
+            try
+            {
+                TestProgressBar.Value = 0;
+
+                var result = await _presetTestRunner.RunAsync(request, progress);
+
+                var bestPresetName = result.BestPreset?.PresetName ?? "Не найден";
+            }
+            catch (OperationCanceledException)
+            {
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                Title = "Тест престов";
+                SetTestingState(false);
+            }
+        }
+
+        private void SetTestingState(bool isTesting)
+        {
+            StartTestButton.IsEnabled = !isTesting;
+            TargetsListBox.IsEnabled = !isTesting;
+            PresetsListBox.IsEnabled = !isTesting;
+
+            SelectAllTargetsButton.IsEnabled = !isTesting;
+            ClearAllTargetsButton.IsEnabled = !isTesting;
+            SelectAllPresetsButton.IsEnabled = !isTesting;
+            ClearAllPresetsButton.IsEnabled = !isTesting;
         }
     }
 }
