@@ -13,5 +13,12 @@ namespace z2d.Models
         {
             Status = TestCheckStatus.NotApplicable,
         };
+
+        public override string ToString()
+        {
+            return string.IsNullOrWhiteSpace(Details)
+                ? Status.ToString()
+                : $"{Status}: {Details}";
+        }
     }
 }

@@ -9,5 +9,10 @@ namespace z2d.Models
         public required string Name { get; init; }
         public required string Target {  get; init; }
         public required TargetType Type { get; init; }
+
+        public override string ToString()
+        {
+            return $"{Name} ({Target})";
+        }
     }
 }

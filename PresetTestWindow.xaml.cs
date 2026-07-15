@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Windows;
+using Microsoft.Win32;
 using z2d.Models;
 using z2d.Services;
 
@@ -142,7 +143,7 @@ namespace z2d
 
                 var result = await _presetTestRunner.RunAsync(request, progress);
 
-                var bestPresetName = result.BestPreset?.PresetName ?? "Не найден";
+                ShowTestCompletedDialog(result);
             }
             catch (OperationCanceledException)
             {
@@ -169,6 +170,43 @@ namespace z2d
             ClearAllTargetsButton.IsEnabled = !isTesting;
             SelectAllPresetsButton.IsEnabled = !isTesting;
             ClearAllPresetsButton.IsEnabled = !isTesting;
+        }
+
+        private void ShowTestCompletedDialog(PresetTestRunResult result)
+        {
+            var bestPresetName = result.ToString();
+
+            var dialogResult = MessageBox.Show(
+                this,
+                $"Лучший пресет: {bestPresetName}\n\nСохранить результаты тестирования?",
+                "Тестирование завершено",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Information);
+
+            if (dialogResult != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            var saveFileDialog = new SaveFileDialog
+            {
+                Title = "Сохранить результаты тестирования",
+                FileName = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt",
+                Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+                DefaultExt = ".txt",
+                AddExtension = true,
+                OverwritePrompt = true
+            };
+
+            if (saveFileDialog.ShowDialog(this) != true)
+            {
+                return;
+            }
+
+            File.WriteAllText(
+                saveFileDialog.FileName,
+                result.ToReportString(),
+                Encoding.UTF8);
         }
     }
 }

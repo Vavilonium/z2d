@@ -18,5 +18,15 @@ namespace z2d.Models
         public int FailedCount => TargetResults.Count(x => !x.IsSuccessful);
 
         public int Score => SuccessCount * 10;
+
+        public override string ToString()
+        {
+            if (LaunchFailed)
+            {
+                return $"{PresetName}: launch failed ({LaunchError})";
+            }
+
+            return $"{PresetName}: Score={Score}, Success={SuccessCount}, Failed={FailedCount}";
+        }
     }
 }

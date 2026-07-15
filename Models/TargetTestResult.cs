@@ -28,5 +28,11 @@ namespace z2d.Models
 
                 _ => false
             };
+
+        public override string ToString()
+        {
+            var status = IsSuccessful ? "Success" : "Failed";
+            return $"{Target}: {status}";
+        }
     }
 }
