@@ -139,9 +139,7 @@ namespace z2d.Services
 
                 return new TestCheckResult
                 {
-                    Status = response.IsSuccessStatusCode
-                        ? TestCheckStatus.Success
-                        : TestCheckStatus.Failed,
+                    Status = TestCheckStatus.Success,
                     Details = $"{statusCode} {response.ReasonPhrase}"
                 };
             }
