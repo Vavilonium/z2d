@@ -27,7 +27,7 @@ namespace z2d.Models
             sb.AppendLine(separator);
             sb.AppendLine();
 
-            sb.AppendLine($"Best preset: {ToString()}");
+            sb.AppendLine($"{ToString()}");
             sb.AppendLine();
 
             foreach (var presetResult in PresetResults)
